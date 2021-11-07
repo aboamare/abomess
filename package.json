@@ -1,0 +1,21 @@
+{
+  "name": "abomess",
+  "version": "0.1.0",
+  "description": "ABOamare implementation and demo of the MCP Maritime MESSaging Service ",
+  "main": "service.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "MCP",
+    "MMS",
+    "AboaMare"
+  ],
+  "author": "Robert Aarts",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@hapi/hapi": "^20.2.1",
+    "@hapi/inert": "^6.0.4",
+    "hapi-plugin-websocket": "^2.3.7"
+  }
+}
