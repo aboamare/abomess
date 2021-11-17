@@ -4,7 +4,7 @@
   "description": "ABOamare implementation and demo of the MCP Maritime MESSaging Service ",
   "main": "service.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "keywords": [
     "MCP",
@@ -14,8 +14,15 @@
   "author": "Robert Aarts",
   "license": "Apache-2.0",
   "dependencies": {
-    "@hapi/hapi": "^20.2.1",
-    "@hapi/inert": "^6.0.4",
-    "hapi-plugin-websocket": "^2.3.7"
+    "dayjs": "^1.10.7",
+    "jose": "^4.3.3",
+    "lodash": "^4.17.21",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "chai-json-pattern": "^1.1.0",
+    "chai-like": "^1.1.1",
+    "mocha": "^9.1.3"
   }
 }
