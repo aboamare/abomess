@@ -30,25 +30,14 @@ class Message {
           }
         }
       }
+      if (!message.id) {
+        message.id = uuid.v4()
+      }  
     }
-    if (!message.id) {
-      message.id = uuid.v4()
-    }
-    this.message = message
-    this._sender = sender
+    Object.assign(this, message)
+    this.sender = sender
   }
 
-  get body () {
-    return this.message.body
-  }
-
-  get raw () {
-    return this.message.body
-  }
-
-  get sender () {
-    return this.message.sender || this._sender
-  }
 }
 
 class SignedMessage extends Message {
@@ -56,9 +45,6 @@ class SignedMessage extends Message {
     super(message, sender, options)
   }
 
-  get payload () {
-    return this.body.payload //TODO: this should be UrlBase64Decoded
-  }
 }
  
 function parsedMessage(message, sender = null, options = { strict: false }) {

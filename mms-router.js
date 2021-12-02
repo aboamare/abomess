@@ -36,7 +36,8 @@ class DB {
     }
     const subscriber = this.subscribers[mrn]
     for (let topic of topics) {
-      subscriber[topic] = subscriber[topic] || new Set([])
+      const pendingTopicMessages = this.topics[topic] || []
+      subscriber[topic] = subscriber[topic] || new Set(Object.keys(pendingTopicMessages))
     }
   }
 
@@ -238,10 +239,14 @@ class Router {
     return messages //first message in this list is the first one that should be delivered
   }
 
-  _registerInterest (agent, interest) {
+  _ensureInterest (interest) {
     if (!this.interests[interest]) {
       this.interests[interest] = new Set([])
     }
+  }
+
+  _registerInterest (agent, interest) {
+    this._ensureInterest(interest)
     this.interests[interest].add(agent)
   }
 
@@ -315,7 +320,7 @@ class Router {
      * - a JWS signature  
      */
     const parsed = Message(obj, agent.mrn, { protocolMsg: true})
-    if (parsed.payload === agent._nonce) {
+    if (parsed.payload && parsed.payload.nonce === agent._nonce) {
       delete agent._nonce
       agent.authenticated = dayjs.utc().toDate()
       console.info(`Agent ${agent.mrn} authenticated ${agent.authenticated}`)
@@ -348,7 +353,7 @@ class Router {
      * Deliver the messages to the agent as specified in the object.
      *
      * The object may contain filters:
-     * - interests: an array with topic MRNs or the special "pm", ordered in priority (most important first)
+     * - interests: an array with topic MRNs or the special "dm", ordered in priority (most important first)
      * - since: an integer with the seconds since the Unix Epoch
      *
      * limiters:
@@ -366,11 +371,11 @@ class Router {
     const messages = this._getMessagesFor(agent, obj)
     if (messages.length) {
       if (obj && obj.collate === true) {
-        agent.send({ message: messages })
+        agent.send(messages)
         this.db.markAsDelivered(agent.mrn, messages)
       } else {
         messages.forEach(m => {
-          agent.send({ message: m })
+          agent.send(m)
           this.db.markAsDelivered(agent.mrn, m)
         })
       }
@@ -465,6 +470,7 @@ class Router {
         topics = [topics]
       }
       topics.forEach( topic => {
+        this._ensureInterest(topic)
         agents.push(...this.interests[topic])
       })
       agents = new Set(agents)
