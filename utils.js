@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const dayjs = require('dayjs')
 const { sampleSize } = require('lodash/collection')
 
@@ -8,6 +9,10 @@ function expiresIn (expirationTimestamp, now) {
 
 function isNonEmptyString (str) {
   return typeof str === 'string' && str.length > 0
+}
+
+function nonce (bytes=8) {
+  return crypto.randomBytes(bytes).toString('base64')
 }
 
 const Chars = {
@@ -36,5 +41,6 @@ function randomId (length = 6, options = {uppers: false, numbers: true, lowers: 
 module.exports = {
   expiresIn,
   isNonEmptyString,
+  nonce,
   randomId
 }

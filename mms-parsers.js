@@ -62,20 +62,15 @@ class SignedMessage extends Message {
 }
  
 function parsedMessage(message, sender = null, options = { strict: false }) {
-  if (typeof message.body === 'string') {
-    return new Message(message, sender, options)
-  } else if (typeof message.body === 'object') {
-    const body = message.body
-    if (isNonEmptyString(body.signature)) { // assume a flat JWS JSON serialization
-      if(isNonEmptyString(body.payload) && isNonEmptyString(body.protected)) {
-        // really looks like a JWS so let's try
-        return new SignedMessage(message, sender, options)
-      }
+  if (isNonEmptyString(message.signature)) {  // assume a flat JWS JSON serialization
+    if(isNonEmptyString(message.payload) && isNonEmptyString(message.protected)) {
+      // really looks like a JWS so let's try
+      return new SignedMessage(message, sender, options)
     }
-  } else {
-    // fall back to "null" parser
-    return new Message(message, sender, options)
   }
+
+  // fall back to "null" parser
+  return new Message(message, sender, options)
 }
 
 module.exports = (message, sender = null, options = {strict: false}) => parsedMessage(message, sender, options)

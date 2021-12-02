@@ -399,19 +399,22 @@ class Router {
     }
     agent.mrn = msg.mrn
   
+    let interests = []
     // if interests are present it MUST be an array
-    if (msg.interests && !Array.isArray(msg.interests)) {
-      throw new MMSError(InvalidMsg)
-    }
-    const interests = [...msg.interests]
-    for (let interest of interests || []) {
-      //TODO: check if interests is in correct format etc.
-      //TODO: check that the interest is not the mrn of an entity
-      agent.addInterest(interest)
-      this._registerInterest(agent, interest)
+    if (msg.interests) {
+      if (!Array.isArray(msg.interests)) {
+        throw new MMSError(InvalidMsg)
+      }
+      interests = [...msg.interests]
+      for (let interest of interests || []) {
+        //TODO: check if interests is in correct format etc.
+        //TODO: check that the interest is not the mrn of an entity
+        agent.addInterest(interest)
+        this._registerInterest(agent, interest)
+      }
     }
 
-    if (msg.pm !== false) {
+    if (msg.dm !== false) {
       interests.unshift(agent.mrn)
       this._registerInterest(agent, agent.mrn)
       authRequired = true
@@ -484,8 +487,8 @@ class Router {
   unregister (agent) {
     for (let interest in this.interests) {
       this.interests[interest].delete(agent)
-      if (db[interest].size < 1) {
-        delete db[interest]
+      if (this.db[interest].size < 1) {
+        delete this.db[interest]
       }
     }
     this.agents.delete(agent)
