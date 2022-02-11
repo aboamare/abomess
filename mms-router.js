@@ -62,20 +62,27 @@ class DB {
   }
 
   purgeExpiredMessages () {
-    const now = dayjs.utc().valueOf()
+    const now = dayjs.utc().unix()
     const purgedIds = new Set([])
     Object.values(this.topics).forEach(topicMessages => {
       for (let id in topicMessages) {
         const message = topicMessages[id]
         if (message.expires < now) {
           delete topicMessages[id]
-          purgedIds.add(message.id)
+          purgedIds.add({topic: message.subject, id: message.id})
         }
       }
     })
     const _subsciberObjs = Object.values(this.subscribers)
-    _subsciberObjs.forEach(pendingMessageIds => {
-      purgedIds.forEach(id => pendingMessageIds.delete(id))
+    purgedIds.forEach(m => {
+      _subsciberObjs.forEach(pendingMessageIds => {
+        try {
+          pendingMessageIds[m.topic].delete(m.id)
+        } catch (err) {
+          // ignore absent topic or message id
+        }
+      })
+      console.debug(`Purged message ${m.id}`)
     })
   }
 
@@ -163,7 +170,7 @@ class Agent {
   }
 
   set mrn (newMRN) {
-    if (!!this._mrn) {
+    if (!!this._mrn && (this.mrn !== newMRN)) {
       throw new MMSError(MRNChanged)
     }
     this._mrn = newMRN
