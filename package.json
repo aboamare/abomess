@@ -2,8 +2,9 @@
   "name": "abomess",
   "version": "0.1.0",
   "description": "ABOamare implementation and demo of the MCP Maritime MESSaging Service ",
-  "main": "service.js",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "mocha"
   },
   "keywords": [
