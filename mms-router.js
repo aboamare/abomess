@@ -37,7 +37,7 @@ class DB {
     const subscriber = this.subscribers[mrn]
     for (let topic of topics) {
       const pendingTopicMessages = this.topics[topic] || []
-      subscriber[topic] = subscriber[topic] || new Set(Object.keys(pendingTopicMessages))
+      subscriber[topic] = subscriber[topic] || new Set(Object.keys(pendingTopicMessages))
     }
   }
 
@@ -500,7 +500,8 @@ class Router {
   unregister (agent) {
     for (let interest in this.interests) {
       this.interests[interest].delete(agent)
-      if (this.db[interest].size < 1) {
+      const dbInterest = this.db[interest]
+      if (dbInterest && dbInterest.size < 1) {
         delete this.db[interest]
       }
     }
